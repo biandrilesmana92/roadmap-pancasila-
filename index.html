@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peta Konsep Pancasila</title>
+  <style>
+    /* CSS Tokens & Base Settings */
+    :root {
+      --body-bg: #ffffff;
+      --surface: #ffffff;
+      --surface-dim: #f8f9fa;
+      --surface-bright: #ffffff;
+      --surface-container: #f1f3f4;
+      --on-surface: #1f1f1f;
+      --on-surface-variant: #5f6368;
+      --primary: #1a73e8;
+      --accent-container: #e8f0fe;
+      --stroke-default: #dadce0;
+      --outline: #747775;
+      --r-s: 8px;
+      --r-m: 12px;
+      --r-full: 999px;
+      --ff-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --ff-mono: 'Courier New', Courier, monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --body-bg: #121212;
+        --surface: #121212;
+        --surface-dim: #1e1e1e;
+        --surface-bright: #2d2d2d;
+        --surface-container: #252525;
+        --on-surface: #e3e3e3;
+        --on-surface-variant: #9aa0a6;
+        --primary: #8ab4f8;
+        --accent-container: #004a77;
+        --stroke-default: #444746;
+        --outline: #8e918f;
+      }
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background-color: var(--body-bg);
+      color: var(--on-surface);
+      font-family: var(--ff-sans);
+    }
+
+    .widget-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    .widget-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .widget-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .widget-subtitle {
+      margin: 0;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--on-surface-variant);
+    }
+
+    /* Filter Control Buttons */
+    .control-deck {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .lumi-chip-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--on-surface);
+      background: var(--surface-dim);
+      border: 1px solid var(--stroke-default);
+      border-radius: var(--r-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lumi-chip-item:hover {
+      background: var(--surface-container);
+    }
+
+    .lumi-chip-item.is-active {
+      color: var(--primary);
+      background: var(--accent-container);
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    /* Mindmap SVG Container */
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      background: var(--surface-dim);
+      border-radius: var(--r-m);
+      border: 1px solid var(--stroke-default);
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    svg.mindmap-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Interactive Node States */
+    .node-group {
+      cursor: pointer;
+      transition: opacity 0.25s ease;
+    }
+
+    .node-group rect {
+      transition: fill 0.2s ease, stroke 0.2s ease, stroke-width 0.2s ease;
+    }
+
+    .node-group:hover rect {
+      stroke: var(--primary);
+      stroke-width: 1.5px;
+    }
+
+    .node-group.is-dimmed {
+      opacity: 0.35;
+    }
+
+    .node-group.is-active rect {
+      fill: var(--accent-container) !important;
+      stroke: var(--primary) !important;
+      stroke-width: 2px !important;
+    }
+
+    .edge-line {
+      transition: stroke 0.25s ease, opacity 0.25s ease;
+    }
+
+    .edge-line.is-dimmed {
+      opacity: 0.2;
+    }
+
+    .edge-line.is-highlighted {
+      stroke: var(--primary) !important;
+      stroke-width: 2px !important;
+      opacity: 1 !important;
+    }
+
+    /* Detail Inspector Card */
+    .inspector-card {
+      background: var(--surface-bright);
+      border: 1px solid var(--stroke-default);
+      border-radius: var(--r-m);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .inspector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--stroke-default);
+    }
+
+    .inspector-tag {
+      font-family: var(--ff-mono);
+      font-size: 12px;
+      color: var(--primary);
+      background: var(--accent-container);
+      padding: 4px 12px;
+      border-radius: var(--r-full);
+    }
+
+    .inspector-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .inspector-body {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .inspector-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .inspector-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .inspector-section {
+      background: var(--surface-dim);
+      border-radius: var(--r-s);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .inspector-label {
+      font-size: 11px;
+      font-family: var(--ff-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--on-surface-variant);
+    }
+
+    .inspector-val {
+      font-size: 13px;
+      color: var(--on-surface);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="widget-container">
+    <!-- Judul Widget -->
+    <div class="widget-header">
+      <h1 class="widget-title">Pancasila: Dimensi &amp; Kedudukan</h1>
+      <p class="widget-subtitle">Peta Konsep Dasar Falsafah, Ideologi Negara, dan Sistem Filsafat</p>
+    </div>
+
+    <!-- Tombol Filter Dimensi -->
+    <div class="control-deck" id="filter-deck">
+      <button class="lumi-chip-item is-active" data-dim="all">Semua Dimensi</button>
+      <button class="lumi-chip-item" data-dim="falsafah">1. Dasar Falsafah</button>
+      <button class="lumi-chip-item" data-dim="ideologi">2. Ideologi Negara</button>
+      <button class="lumi-chip-item" data-dim="filsafat">3. Sistem Filsafat</button>
+    </div>
+
+    <!-- Mind Map SVG -->
+    <div class="map-wrapper" id="map-zone">
+      <svg class="mindmap-svg" viewBox="0 0 660 380">
+        <defs>
+          <marker id="lumi-caret" viewBox="0 0 10 10" refX="7.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto">
+            <path d="M 3 1.2 L 7.5 5 L 3 8.8" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- Garis Penghubung (Edges) -->
+        <g id="edges-group">
+          <line class="edge-line" data-branch="root" x1="330" y1="58" x2="330" y2="82" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4"/>
+          <line class="edge-line" data-branch="root" x1="110" y1="82" x2="550" y2="82" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4"/>
+          
+          <line class="edge-line" data-branch="falsafah" x1="110" y1="82" x2="110" y2="108" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="ideologi" x1="330" y1="82" x2="330" y2="108" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="filsafat" x1="550" y1="82" x2="550" y2="108" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+
+          <line class="edge-line" data-branch="falsafah" x1="110" y1="156" x2="110" y2="192" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="falsafah" x1="110" y1="238" x2="110" y2="246" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="falsafah" x1="110" y1="292" x2="110" y2="300" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+
+          <line class="edge-line" data-branch="ideologi" x1="330" y1="156" x2="330" y2="192" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="ideologi" x1="330" y1="238" x2="330" y2="246" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="ideologi" x1="330" y1="292" x2="330" y2="300" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+
+          <line class="edge-line" data-branch="filsafat" x1="550" y1="156" x2="550" y2="192" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="filsafat" x1="550" y1="238" x2="550" y2="246" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+          <line class="edge-line" data-branch="filsafat" x1="550" y1="292" x2="550" y2="300" fill="none" stroke="var(--on-surface)" stroke-width="1.3" stroke-dasharray="0 4" marker-end="url(#lumi-caret)"/>
+        </g>
+
+        <!-- Simpul Konsep (Nodes) -->
+        <g id="nodes-group">
+          <!-- Root Node -->
+          <g class="node-group is-active" id="node-root" data-id="root" data-branch="root">
+            <rect x="220" y="16" width="220" height="42" rx="21" fill="var(--accent-container)" stroke="var(--primary)" stroke-width="1.5"/>
+            <text x="330" y="37" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="600" fill="var(--on-surface)">PANCASILA</text>
+          </g>
+
+          <!-- Branch 1: Dasar Falsafah -->
+          <g class="node-group" id="node-b1" data-id="b1" data-branch="falsafah">
+            <rect x="25" y="112" width="170" height="44" rx="22" fill="var(--surface-bright)" stroke="var(--outline)" stroke-width="1"/>
+            <text x="110" y="128" text-anchor="middle" font-size="14" font-weight="500" fill="var(--on-surface)">Dasar Falsafah</text>
+            <text x="110" y="144" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Weltanschauung</text>
+          </g>
+
+          <g class="node-group" id="node-b1-1" data-id="b1-1" data-branch="falsafah">
+            <rect x="30" y="200" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="110" y="214" text-anchor="middle" font-size="13" fill="var(--on-surface)">Definisi &amp; Hakikat</text>
+            <text x="110" y="228" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Sumber Hukum</text>
+          </g>
+          <g class="node-group" id="node-b1-2" data-id="b1-2" data-branch="falsafah">
+            <rect x="30" y="254" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="110" y="268" text-anchor="middle" font-size="13" fill="var(--on-surface)">Fokus &amp; Ciri Khas</text>
+            <text x="110" y="282" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Nilai Kodrati</text>
+          </g>
+          <g class="node-group" id="node-b1-3" data-id="b1-3" data-branch="falsafah">
+            <rect x="30" y="308" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="110" y="322" text-anchor="middle" font-size="13" fill="var(--on-surface)">Penerapan Nyata</text>
+            <text x="110" y="336" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">UUD 1945 &amp; UU</text>
+          </g>
+
+          <!-- Branch 2: Ideologi Negara -->
+          <g class="node-group" id="node-b2" data-id="b2" data-branch="ideologi">
+            <rect x="245" y="112" width="170" height="44" rx="22" fill="var(--surface-bright)" stroke="var(--outline)" stroke-width="1"/>
+            <text x="330" y="128" text-anchor="middle" font-size="14" font-weight="500" fill="var(--on-surface)">Ideologi Negara</text>
+            <text x="330" y="144" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Ideologi Terbuka</text>
+          </g>
+
+          <g class="node-group" id="node-b2-1" data-id="b2-1" data-branch="ideologi">
+            <rect x="250" y="200" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="330" y="214" text-anchor="middle" font-size="13" fill="var(--on-surface)">Definisi &amp; Hakikat</text>
+            <text x="330" y="228" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Pedoman Hidup</text>
+          </g>
+          <g class="node-group" id="node-b2-2" data-id="b2-2" data-branch="ideologi">
+            <rect x="250" y="254" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="330" y="268" text-anchor="middle" font-size="13" fill="var(--on-surface)">Fokus &amp; Ciri Khas</text>
+            <text x="330" y="282" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Adaptif &amp; Dinamis</text>
+          </g>
+          <g class="node-group" id="node-b2-3" data-id="b2-3" data-branch="ideologi">
+            <rect x="250" y="308" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="330" y="322" text-anchor="middle" font-size="13" fill="var(--on-surface)">Penerapan Nyata</text>
+            <text x="330" y="336" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Kebijakan &amp; Konsensus</text>
+          </g>
+
+          <!-- Branch 3: Sistem Filsafat -->
+          <g class="node-group" id="node-b3" data-id="b3" data-branch="filsafat">
+            <rect x="465" y="112" width="170" height="44" rx="22" fill="var(--surface-bright)" stroke="var(--outline)" stroke-width="1"/>
+            <text x="550" y="128" text-anchor="middle" font-size="14" font-weight="500" fill="var(--on-surface)">Sistem Filsafat</text>
+            <text x="550" y="144" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Bangunan Ilmiah</text>
+          </g>
+
+          <g class="node-group" id="node-b3-1" data-id="b3-1" data-branch="filsafat">
+            <rect x="470" y="200" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="550" y="214" text-anchor="middle" font-size="13" fill="var(--on-surface)">Definisi &amp; Hakikat</text>
+            <text x="550" y="228" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Kesatuan Organik</text>
+          </g>
+          <g class="node-group" id="node-b3-2" data-id="b3-2" data-branch="filsafat">
+            <rect x="470" y="254" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="550" y="268" text-anchor="middle" font-size="13" fill="var(--on-surface)">Fokus &amp; Ciri Khas</text>
+            <text x="550" y="282" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">3 Dimensi Utama</text>
+          </g>
+          <g class="node-group" id="node-b3-3" data-id="b3-3" data-branch="filsafat">
+            <rect x="470" y="308" width="160" height="38" rx="19" fill="var(--surface-container)" stroke="var(--stroke-default)"/>
+            <text x="550" y="322" text-anchor="middle" font-size="13" fill="var(--on-surface)">Penerapan Nyata</text>
+            <text x="550" y="336" text-anchor="middle" font-size="12" font-style="italic" fill="var(--on-surface-variant)">Etika &amp; Ilmu</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Panel Detail (Inspector) -->
+    <div class="inspector-card" id="inspector-panel">
+      <div class="inspector-header">
+        <h3 class="inspector-title" id="inspect-title">Pancasila (Pandangan Umum)</h3>
+        <span class="inspector-tag" id="inspect-tag">Pusat Sistem</span>
+      </div>
+      <p class="inspector-body" id="inspect-desc">
+        Pancasila merupakan fondasi tatanan berbangsa dan bernegara Indonesia yang mencakup kedudukan sebagai Dasar Falsafah Negara (Philosophische Grondslag), Ideologi Nasional, dan Sistem Filsafat ilmiah.
+      </p>
+      <div class="inspector-grid">
+        <div class="inspector-section">
+          <span class="inspector-label" id="inspect-lbl-1">Prinsip Utama</span>
+          <span class="inspector-val" id="inspect-val-1">5 Sila sebagai kesatuan organis yang tak terpisahkan.</span>
+        </div>
+        <div class="inspector-section">
+          <span class="inspector-label" id="inspect-lbl-2">Fungsi Strategis</span>
+          <span class="inspector-val" id="inspect-val-2">Pemersatu bangsa, pandangan hidup, dan dasar hukum tertinggi.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data Detail Node
+    const NODE_DETAILS = {
+      'root': {
+        title: 'Pancasila (Pandangan Umum)',
+        tag: 'Pusat Konsep',
+        desc: 'Pancasila adalah norma dasar dan pandangan hidup bangsa Indonesia yang mengintegrasikan aspek hukum, politik, moral, dan filsafat ke dalam satu kesatuan yang utuh.',
+        lbl1: 'Kedudukan Utama',
+        val1: 'Dasar Negara, Ideologi Nasional, & Sistem Filsafat Organik.',
+        lbl2: 'Tujuan Bangsa',
+        val2: 'Mewujudkan masyarakat adil dan makmur berdasarkan nilai Ketuhanan hingga Keadilan Sosial.'
+      },
+      'b1': {
+        title: '1. Dasar Falsafah Negara (Philosophische Grondslag)',
+        tag: 'Dimensi Hukum & Moral',
+        desc: 'Pancasila sebagai fondasi paling mendasar (Weltanschauung) yang menjadi sumber dari segala sumber hukum dan landasan moral berdirinya Negara Kesatuan Republik Indonesia.',
+        lbl1: 'Fokus Utama',
+        val1: 'Pengalasan yuridis normatif dan nilai etis dasar pembentukan undang-undang.',
+        lbl2: 'Penerapan',
+        val2: 'Pembukaan UUD 1945, Batang Tubuh, dan tertib hukum nasional.'
+      },
+      'b1-1': {
+        title: 'Dasar Falsafah › Definisi & Hakikat',
+        tag: 'Sumber Hukum Murni',
+        desc: 'Merupakan landasan awal (Grondslag) berdirinya negara. Setiap aturan hukum positif di Indonesia wajib bersumber dan tidak boleh bertentangan dengan nilai Pancasila.',
+        lbl1: 'Istilah Kunci',
+        val1: 'Philosophische Grondslag & Staatsfundamentalnorm.',
+        lbl2: 'Karakteristik',
+        val2: 'Absolut, mengikat secara hukum, dan menjadi cita hukum (Rechtsidee).'
+      },
+      'b1-2': {
+        title: 'Dasar Falsafah › Fokus & Ciri Khas',
+        tag: 'Nilai Kodrati Manusia',
+        desc: 'Menempatkan nilai Ketuhanan, Kemanusiaan, Persatuan, Kerakyatan, dan Keadilan sebagai seperangkat prinsip moral abadi dalam penyelenggaraan pemerintahan.',
+        lbl1: 'Landasan Etik',
+        val1: 'Relijiusitas, Humanisme, Nasionalisme, Demokrasi, dan Keadilan.',
+        lbl2: 'Ciri Utama',
+        val2: 'Menyeimbangkan hak dan kewajiban asasi setiap warga negara.'
+      },
+      'b1-3': {
+        title: 'Dasar Falsafah › Penerapan Nyata',
+        tag: 'Implementasi Yuridis',
+        desc: 'Terwujud nyata dalam Pembukaan UUD 1945 alinea IV, penyusunan UU oleh DPR/Presiden, dan pengujian undang-undang oleh Mahkamah Konstitusi.',
+        lbl1: 'Contoh Konkret',
+        val1: 'Harmonisasi RUU agar selaras dengan nilai keadilan sosial.',
+        lbl2: 'Dampak Legal',
+        val2: 'Pembatalan pasal UU yang bertentangan dengan prinsip dasar Pancasila.'
+      },
+      'b2': {
+        title: '2. Ideologi Negara (Ideologi Nasional)',
+        tag: 'Dimensi Politik & Sosial',
+        desc: 'Pancasila sebagai sistem nilai bersama, cita-cita politik, dan pedoman arahan bagi seluruh rakyat serta penyelenggara negara dalam berbangsa dan bernegara.',
+        lbl1: 'Sifat Utama',
+        val1: 'Ideologi Terbuka: adaptif, dinamis, dan tidak kaku.',
+        lbl2: 'Core Value',
+        val2: 'Persatuan dalam keberagaman (Bhinneka Tunggal Ika).'
+      },
+      'b2-1': {
+        title: 'Ideologi Negara › Definisi & Hakikat',
+        tag: 'Pedoman Berbangsa',
+        desc: 'Seperangkat gagasan dan keyakinan terstruktur mengenai kehidupan ideal yang ingin dicapai bersama oleh seluruh elemen bangsa Indonesia.',
+        lbl1: 'Orientasi',
+        val1: 'Mencapai tujuan nasional dan persatuan di atas perbedaan suku/agama.',
+        lbl2: 'Fungsi Utama',
+        val2: 'Membentuk identitas nasional dan pemersatu keberagaman.'
+      },
+      'b2-2': {
+        title: 'Ideologi Negara › Fokus & Ciri Khas',
+        tag: 'Dimensi Keterbukaan',
+        desc: 'Memiliki 3 dimensi utama: Dimensi Realitas (hidup di masyarakat), Dimensi Idealitas (memuat cita-cita), dan Dimensi Fleksibilitas (terbuka bagi pemikiran baru).',
+        lbl1: 'Karakter Unik',
+        val1: 'Bukan doktrin tertutup; menyerap perkembangan zaman tanpa kehilangan jati diri.',
+        lbl2: 'Prinsip Penyeimbang',
+        val2: 'Menolak individualisme ekstrem maupun kolektivisme otoriter.'
+      },
+      'b2-3': {
+        title: 'Ideologi Negara › Penerapan Nyata',
+        tag: 'Praktik Bermasyarakat',
+        desc: 'Tercermin dalam kebijakan pembangunan nasional, konsensus politik musyawarah mufakat, toleransi beragama, dan diplomasi bebas aktif di ranah internasional.',
+        lbl1: 'Aplikasi Sosial',
+        val1: 'Gotong royong warga, musyawarah warga, dan toleransi antarumat.',
+        lbl2: 'Aplikasi Kebijakan',
+        val2: 'Program perlindungan sosial dan pemerataan pembangunan daerah.'
+      },
+      'b3': {
+        title: '3. Sistem Filsafat (Philosophical System)',
+        tag: 'Dimensi Akademia & Epistemis',
+        desc: 'Pancasila sebagai pemikiran kritis ilmiah yang kritis, rasional, dan sistematis mengenai hakikat keberadaan manusia dan negara Indonesia.',
+        lbl1: 'Tiga Pilar',
+        val1: 'Ontologis (Hakikat), Epistemologis (Pengetahuan), Aksiologis (Nilai).',
+        lbl2: 'Sifat Sistem',
+        val2: 'Hierarkis piramidal dan saling mengunci secara ilmiah.'
+      },
+      'b3-1': {
+        title: 'Sistem Filsafat › Definisi & Hakikat',
+        tag: 'Kesatuan Organik',
+        desc: 'Lima sila bukanlah gagasan terpisah, melainkan satu kesatuan menyeluruh di mana sila pertama menjiwai sila berikutnya, dan sila kelima dijiwai sila sebelumnya.',
+        lbl1: 'Struktur Pemikiran',
+        val1: 'Hierarkis-piramidal (Sila 1 menjiwai Sila 2, 3, 4, 5).',
+        lbl2: 'Sifat Ilmiah',
+        val2: 'Dapat dipertanggungjawabkan secara logis dan filosofis.'
+      },
+      'b3-2': {
+        title: 'Sistem Filsafat › Fokus & Ciri Khas',
+        tag: 'Kajian 3 Pilar Filsafat',
+        desc: '1) Ontologis: Hakikat manusia sebagai makhluk monopluralis; 2) Epistemologis: Sumber pengetahuan Pancasila dari budaya lokal; 3) Aksiologis: Kemanfaatan nilai bagi kehidupan.',
+        lbl1: 'Landasan Manusia',
+        val1: 'Manusia sebagai monopluralis (Jiwa-Raga, Individu-Sosial).',
+        lbl2: 'Orientasi Nilai',
+        val2: 'Nilai kebenaran, keindahan, kebaikan, dan kesucian.'
+      },
+      'b3-3': {
+        title: 'Sistem Filsafat › Penerapan Nyata',
+        tag: 'Etika & Pengembangan Ilmu',
+        desc: 'Pancasila sebagai Etika Politik (pedoman moral pejabat) dan Dasar Nilai Pengembangan Ilmu Pengetahuan dan Teknologi (Iptek) yang berwawasan kemanusiaan.',
+        lbl1: 'Etika Publik',
+        val1: 'Mencegah korupsi dan penyalahgunaan kekuasaan.',
+        lbl2: 'Pengembangan Iptek',
+        val2: 'Inovasi teknologi yang tidak merusak lingkungan dan martabat manusia.'
+      }
+    };
+
+    let selectedNodeId = 'root';
+    let currentFilter = 'all';
+
+    function updateInspector(nodeId) {
+      const data = NODE_DETAILS[nodeId] || NODE_DETAILS['root'];
+      document.getElementById('inspect-title').textContent = data.title;
+      document.getElementById('inspect-tag').textContent = data.tag;
+      document.getElementById('inspect-desc').textContent = data.desc;
+      document.getElementById('inspect-lbl-1').textContent = data.lbl1;
+      document.getElementById('inspect-val-1').textContent = data.val1;
+      document.getElementById('inspect-lbl-2').textContent = data.lbl2;
+      document.getElementById('inspect-val-2').textContent = data.val2;
+    }
+
+    function updateViz() {
+      const allNodes = document.querySelectorAll('.node-group');
+      const allEdges = document.querySelectorAll('.edge-line');
+
+      allNodes.forEach(node => {
+        const nodeId = node.getAttribute('data-id');
+        const branch = node.getAttribute('data-branch');
+
+        const isSelected = (nodeId === selectedNodeId);
+        const matchesFilter = (currentFilter === 'all' || branch === 'root' || branch === currentFilter);
+
+        if (isSelected) {
+          node.classList.add('is-active');
+          node.classList.remove('is-dimmed');
+        } else {
+          node.classList.remove('is-active');
+          if (!matchesFilter) {
+            node.classList.add('is-dimmed');
+          } else {
+            node.classList.remove('is-dimmed');
+          }
+        }
+      });
+
+      allEdges.forEach(edge => {
+        const branch = edge.getAttribute('data-branch');
+        const matchesFilter = (currentFilter === 'all' || branch === 'root' || branch === currentFilter);
+
+        const selectedNodeObj = document.getElementById(`node-${selectedNodeId}`);
+        const selectedBranch = selectedNodeObj ? selectedNodeObj.getAttribute('data-branch') : 'root';
+        const isHighlighted = (selectedBranch !== 'root' && branch === selectedBranch);
+
+        if (isHighlighted) {
+          edge.classList.add('is-highlighted');
+          edge.classList.remove('is-dimmed');
+        } else {
+          edge.classList.remove('is-highlighted');
+          if (!matchesFilter) {
+            edge.classList.add('is-dimmed');
+          } else {
+            edge.classList.remove('is-dimmed');
+          }
+        }
+      });
+    }
+
+    function initEvents() {
+      document.querySelectorAll('.node-group').forEach(node => {
+        node.addEventListener('click', () => {
+          selectedNodeId = node.getAttribute('data-id');
+          updateInspector(selectedNodeId);
+          updateViz();
+        });
+      });
+
+      document.querySelectorAll('#filter-deck .lumi-chip-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#filter-deck .lumi-chip-item').forEach(b => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          currentFilter = btn.getAttribute('data-dim');
+
+          if (currentFilter === 'all') selectedNodeId = 'root';
+          else if (currentFilter === 'falsafah') selectedNodeId = 'b1';
+          else if (currentFilter === 'ideologi') selectedNodeId = 'b2';
+          else if (currentFilter === 'filsafat') selectedNodeId = 'b3';
+
+          updateInspector(selectedNodeId);
+          updateViz();
+        });
+      });
+    }
+
+    initEvents();
+    updateInspector('root');
+    updateViz();
+  </script>
+</body>
+</html>
